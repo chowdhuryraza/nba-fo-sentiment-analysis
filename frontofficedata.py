@@ -5,43 +5,43 @@ import os
 
 load_dotenv()
 
+def main():
+    nba_team_names = {"76ers", "Bucks", "Bulls", "Celtics", "Cavs", "Clippers", "Grizzlies", 
+                    "Hawks", "Heat", "Hornets", "Jazz", "Kings", "Knicks", "Lakers", "Magic", 
+                    "Mavericks", "Nets", "Nuggets", "Pacers", "Pelicans", "Pistons", "Raptors", 
+                    "Rockets", "Spurs", "Suns", "Thunder", "Trail Blazers", "Timberwolves", 
+                    "Warriors", "Wizards"}
+    nba_teams_personnel = defaultdict(list)
+    added_teams = set()
 
-nba_team_names = {"76ers", "Bucks", "Bulls", "Celtics", "Cavs", "Clippers", "Grizzlies", 
-                  "Hawks", "Heat", "Hornets", "Jazz", "Kings", "Knicks", "Lakers", "Magic", 
-                  "Mavericks", "Nets", "Nuggets", "Pacers", "Pelicans", "Pistons", "Raptors", 
-                  "Rockets", "Spurs", "Suns", "Thunder", "Trail Blazers", "Timberwolves", 
-                  "Warriors", "Wizards"}
-nba_teams_personnel = defaultdict(list)
-added_teams = set()
+    headers = {"accept": "application/json"}
 
-headers = {"accept": "application/json"}
+    try:
+        url = f"https://api.sportradar.com/nba/trial/v8/en/league/teams.json?api_key={os.getenv('SPORTRADAR_API_KEY')}"
 
-try:
-    url = f"https://api.sportradar.com/nba/trial/v8/en/league/teams.json?api_key={os.getenv('SPORTRADAR_API_KEY')}"
-
-    response = requests.get(url, headers=headers)
-except BaseException as e:
-    print("Error: ", e)
+        response = requests.get(url, headers=headers)
+    except BaseException as e:
+        print("Error: ", e)
 
 
-for team in (response.json()["teams"]):
-    if team["name"] in nba_team_names and team["name"] not in added_teams:
-        added_teams.add(team["name"])
+    for team in (response.json()["teams"]):
+        if team["name"] in nba_team_names and team["name"] not in added_teams:
+            added_teams.add(team["name"])
 
-        try:
-            team_info_url = f"https://api.sportradar.com/nba/trial/v8/en/teams/{team['id']}/profile.json?api_key={os.getenv('SPORTRADAR_API_KEY')}"
-            team_info_response = requests.get(team_info_url, headers=headers).json()
+            try:
+                team_info_url = f"https://api.sportradar.com/nba/trial/v8/en/teams/{team['id']}/profile.json?api_key={os.getenv('SPORTRADAR_API_KEY')}"
+                team_info_response = requests.get(team_info_url, headers=headers).json()
 
-            if "president" not in team_info_response: 
-                nba_teams_personnel[team["name"]].append(None)
-            else: 
-                nba_teams_personnel[team["name"]].append(team_info_response["president"])
-            if "general_manager" not in team_info_response: 
-                nba_teams_personnel[team["name"]].append(None)
-            else: 
-                nba_teams_personnel[team["name"]].append(team_info_response["general_manager"])
-        except BaseException as e:
-            print("Error: ", e)
+                if "president" not in team_info_response: 
+                    nba_teams_personnel[team["name"]].append(None)
+                else: 
+                    nba_teams_personnel[team["name"]].append(team_info_response["president"])
+                if "general_manager" not in team_info_response: 
+                    nba_teams_personnel[team["name"]].append(None)
+                else: 
+                    nba_teams_personnel[team["name"]].append(team_info_response["general_manager"])
+            except BaseException as e:
+                print("Error: ", e)
 
 
 nba_personnel_data  = {'76ers': ['Daryl Morey', 'Elton Brand'], 
@@ -74,3 +74,7 @@ nba_personnel_data  = {'76ers': ['Daryl Morey', 'Elton Brand'],
  'Trail Blazers': ['Dewayne Hankins', 'Joe Cronin'], 
  'Warriors': ['Brandon Schneider', 'Mike Dunleavy Jr.'], 
  'Wizards': ['Michael Winger', 'Will Dawkins']}
+
+
+if __name__ == "__main__":
+    main()

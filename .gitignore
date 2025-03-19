@@ -1,2 +1,3 @@
 .env
 xscraper.py
+.venv/
