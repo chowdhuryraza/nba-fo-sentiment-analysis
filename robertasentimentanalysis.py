@@ -27,6 +27,7 @@ total_sentiment = {'Negative': 0,
 sentiment_analyzed_count = 0
 
 def row_sentiment(row):
+    global sentiment_analyzed_count
     row_negative = 0
     row_neutral = 0
     row_positive = 0
